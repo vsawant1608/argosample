@@ -1,0 +1,26 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: guestbook
+spec:
+  goTemplate: true
+  goTemplateOptions: ["missingkey=error"]
+  generators:
+  - list:
+      elements:
+      - cluster: in-cluster
+        url: https://kubernetes.default.svc
+      - cluster: dev
+        url: https://api.apl21eyj.eastus.aroapp.io:6443
+  template:
+    metadata:
+      name: '{{.cluster}}-guestbook'
+    spec:
+      project: my-project
+      source:
+        repoURL: https://github.com/vsawant1608/argosample.git
+        targetRevision: HEAD
+        path: basic
+      destination:
+        server: '{{.url}}'
+        namespace: guestbook
